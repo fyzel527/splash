@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script src="https://unpkg.com/three/build/three.min.js"></script>
+    <script src="https://unpkg.com/three/examples/js/loaders/PLYLoader.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('container');
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 10, 7.5).normalize();
+            scene.add(directionalLight);
+
+            const loader = new THREE.PLYLoader();
+            loader.load('/static/splash/your_model.ply', (geometry) => {
+                geometry.computeVertexNormals();
+                const material = new THREE.MeshStandardMaterial({ vertexColors: THREE.VertexColors });
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+            });
+
+            camera.position.z = 5;
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            };
+
+            animate();
+        });
+    </script>
+</body>
+</html>
